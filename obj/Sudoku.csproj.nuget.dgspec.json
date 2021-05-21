@@ -1,0 +1,91 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/scapape/OneDrive/Projects/qsharp/Sudoku/Sudoku/Sudoku.csproj": {}
+  },
+  "projects": {
+    "/Users/scapape/OneDrive/Projects/qsharp/Sudoku/Sudoku/Sudoku.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/scapape/OneDrive/Projects/qsharp/Sudoku/Sudoku/Sudoku.csproj",
+        "projectName": "Sudoku",
+        "projectPath": "/Users/scapape/OneDrive/Projects/qsharp/Sudoku/Sudoku/Sudoku.csproj",
+        "packagesPath": "/Users/scapape/.nuget/packages/",
+        "outputPath": "/Users/scapape/OneDrive/Projects/qsharp/Sudoku/Sudoku/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/scapape/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "Microsoft.Quantum.CsharpGeneration": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[0.14.2011120240, )",
+              "autoReferenced": true
+            },
+            "Microsoft.Quantum.EntryPointDriver": {
+              "target": "Package",
+              "version": "[0.14.2011120240, )",
+              "autoReferenced": true
+            },
+            "Microsoft.Quantum.QSharp.Core": {
+              "target": "Package",
+              "version": "[0.14.2011120240, )"
+            },
+            "Microsoft.Quantum.Runtime.Core": {
+              "target": "Package",
+              "version": "[0.14.2011120240, )",
+              "autoReferenced": true
+            },
+            "Microsoft.Quantum.Simulators": {
+              "target": "Package",
+              "version": "[0.14.2011120240, )",
+              "autoReferenced": true
+            },
+            "Microsoft.Quantum.Standard": {
+              "target": "Package",
+              "version": "[0.14.2011120240, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/5.0.101/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "/Users/scapape/.dotnet/store/|arch|/|tfm|",
+      "/Users/scapape/.nuget/packages"
+    ]
+  }
+}
