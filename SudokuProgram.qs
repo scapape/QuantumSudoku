@@ -41,13 +41,119 @@ namespace ExploringGroversSearchAlgorithm {
     }
 
     @EntryPoint()
+    operation SolveSudoku() : Unit {
+
+        // Define the Sudoku elements depending on the order
+        // order=1: 2x2=4 grid Sudoku; order=2: 4x4=16 grid Sudoku; order=3: 9x9=81 grid Sudoku
+        let order = 2;
+
+        // Each number of the Sudoku is described using 'bitlength' number of bits (or qubits).
+        mutable SudokuNumbers =  new Int[0];
+        mutable bitlength = 0;
+        mutable gridSize = 0;
+        // Grid pairs is a list of pairs of cells that cannot contain the same number (see verticesList for details)
+        mutable gridPairs = new (Int, Int)[0];
+        if (order == 1) {
+            set bitlength = 1;
+            set SudokuNumbers = [0, 1]; 
+            set gridSize = 4;
+            set gridPairs = verticesList(order, gridSize-1);
+        } elif (order == 2) {
+            set bitlength = 2;
+            set SudokuNumbers = [0, 1, 2, 3];
+            //set gridSize = 16;
+            //set gridPairs = verticesList(order, gridSize-1);
+            // TEST
+            set gridSize = 7;
+            set gridPairs = verticesList(order, gridSize-1);
+        } elif (order == 3) {
+            set bitlength = 4;
+            set SudokuNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+            //set gridSize = 81;
+            //set gridPairs = verticesList(order, gridSize-1);
+            // TEST
+            set gridSize = 2;
+            set gridPairs = verticesList(order, gridSize-1);
+        }
+
+        // Prepare permutations of Sudoku numbers
+        // e.g. if Sudoku numbers are [0,1], the function DoPermute returns the array of arrays [[0,1], [1,0]]
+        let SudokuRow = DoPermute(SudokuNumbers, new Int[][0], 0);
+
+        // Prepare the library of solutions 
+        let SudokuAll = [SudokuRow, SudokuRow];  // =2 row of a Sudoku; [SudokuRow, SudokuRow, SudokuRow, SudokuRow] =4 rows of a Sudoku
+
+        // DoPermuteArrays creates final array of arrays of good and bad Sudoku solutions 
+        // e.g. if SudokuAll = [[[0,1], [1,0]], [[0,1], [1,0]]], DoPermuteArrays returns [[0,1,0,1], [0,1,1,0], [1,0,0,1], [1,0,1,0]]
+        // that is the 4 ways of filling a Sudoku based on DoPermute.
+        let SudokuSolutions = DoPermuteArrays(SudokuAll, new Int[][0], 0, new Int[0], new Int[0], new Int[0], new Int[0]);
+
+        // Transform the arrays of Sudoku solutions numbers to bit strings using little-endian encoding
+        // E.g. input [[0,1,2,3], [0,1,3,2]] is transformed to [[False,False,True,False,False,True,True,True], [False,False,True,False,True,True,False,True]]
+        mutable SudokuBitstring = new Bool[][0];
+        for (SudokuSolution in SudokuSolutions) {
+            mutable bitstring = new Bool[0];
+            for (i in SudokuSolution) {
+                set bitstring = bitstring + IntAsBoolArray(i, bitlength);
+            }
+            set SudokuBitstring = SudokuBitstring + [bitstring];
+        } 
+
+        // Define the oracle that finds the Sudoku solutions...
+        let markingOracle = SudokuOracle(gridPairs, _, _, bitlength);
+        // ... and transform it into a phase oracle
+        let phaseOracle = OracleConverter(markingOracle, _);
+
+        // Preallocate the Sudoku solution variable
+        mutable solution = new Bool[gridSize * bitlength];
+
+        // The register has the number of qubits that is bitlength qubits * the number of grid cells considered.
+        using ((register, output) = (Qubit[gridSize * bitlength], Qubit())) {
+            mutable nIterations = 1;
+            mutable isCorrect = false;
+            // We run Grover's search for 1 interation but if we don't find a correct solution
+            // we run it for 2 iterations and keep increasing it by 1 more until a solution
+            // is found or the max number of iterations is reached
+            repeat {
+                RunGroversSearch(register, phaseOracle, nIterations, SudokuBitstring);
+                // MultiM measures each qubit in a given array in the standard basis.
+                let res = MultiM(register);
+                //  We apply the Sudoku oracle (marking oracle) after measurement to check if the
+                // solution is correct. If correct, output qubit is in state |1⟩
+                markingOracle(register, output);
+                if (MResetZ(output) == One) {
+                    set isCorrect = true;
+                    set solution = ResultArrayAsBoolArray(res);
+                }
+                ResetAll(register);
+            }
+            until (isCorrect or nIterations > 30)
+            fixup {
+                set nIterations += 1;
+            }
+            if (not isCorrect) {
+                fail "No valid Sudoku solution was found";
+            }
+        }
+
+        // Convert the valid solution to readable format
+        // Index is the position in the Sudoku grid. Number is the number in decimal.
+        let numberBits = Chunks(bitlength, solution);
+        Message("The resulting Sudoku solution:");
+        for (i in 0 .. gridSize - 1) {
+            Message($" Index {i} - Number {BoolArrayAsInt(numberBits[i])}");
+        }
+    }
+
+
+    
     operation SolveGraphColoringProblem() : Unit {
 
         // Define the Sudoku:
         // - order=2: 4x4=16 grid Sudoku
         // - order=3: 9x9=81 grid Sudoku
         let order = 2;
-        // let gridSize = PowI(order, 2) * PowI(order, 2);
+        //let gridSize = PowI(order, 2) * PowI(order, 2);
         // Grid pairs defines pairs of Sudoku cells that cannot contain the same number
         // (see verticesList for details)
         // let gridPairs = verticesList(order);

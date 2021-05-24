@@ -2,8 +2,9 @@ namespace SudokuElements {
     open Microsoft.Quantum.Math;
     open Microsoft.Quantum.Arrays;
 
-    function verticesList (o : Int) : (Int, Int)[] {
+    function verticesList (o : Int, maxIndex : Int) : (Int, Int)[] {
         // Creates list of pairs of vertices that have to contain different numbers.
+        // 'maxIndex' is used to set a limit on the number of vertices considered (e.g. if maxIndex=2 only the first 3 cells of the 1st row of a Sudoku are considered) 
         // Output example: [(0, 1), (0, 2), (0, 3)]
         // Example:
         // - For a Sudoku of order 2, there are 2^2 * 2^2 numbers (16) in 2^2 blocks (4) (this is also a 4x4 Sudoku);
@@ -34,7 +35,9 @@ namespace SudokuElements {
         for (a in 0 .. o2-1) {
             for (b in a .. o2 .. o2*(o2-2) + a) {
                 for (c in b + o2 .. o2 .. o2*(o2-1) + a) {
-                    set vertices = vertices + [(b, c)];
+                    if (b <= maxIndex and c <= maxIndex) {
+                        set vertices = vertices + [(b, c)];
+                    }
                 }
                 
             }
@@ -43,7 +46,9 @@ namespace SudokuElements {
         for (a in 0 .. o2 .. o2*(o2-1)) {
             for (b in a .. a+o2-2) {
                 for (c in b+1 .. a+o2-1) {
-                    set vertices = vertices + [(b, c)];
+                    if (b <= maxIndex and c <= maxIndex) {
+                        set vertices = vertices + [(b, c)];
+                    }
                 }
                 
             }
@@ -63,11 +68,17 @@ namespace SudokuElements {
 
                         let exists = equalArray(vertices, [n[bp], n[cp]]);
                         if (not exists) {
-                            set vertices = vertices + [(n[bp], n[cp])];
+                            if (n[bp] <= maxIndex and n[cp] <= maxIndex) {
+                                set vertices = vertices + [(n[bp], n[cp])];
+                            }
                         }
                     }
                 }
             }
+        }
+        // Set vertices if Sudoku order is 1
+        if (o == 1) {
+            set vertices = [(0,1), (0,2), (1,3), (2,3)];
         }
         return vertices;
     }
